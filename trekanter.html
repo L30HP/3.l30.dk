@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Right-Angled Triangle Solver</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        #triangle-form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        #triangle-form label {
+            display: inline-block;
+            width: 150px;
+            margin-bottom: 5px;
+        }
+        #triangle-form input {
+            width: 200px;
+            margin-bottom: 10px;
+        }
+        #triangle-form button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+        }
+        #results {
+            max-width: 400px;
+            margin: 20px auto;
+            border-top: 1px solid #ccc;
+            padding-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Right-Angled Triangle Solver</h1>
+    <form id="triangle-form">
+        <label for="side-a">Side a:</label>
+        <input type="number" id="side-a" step="any"><br>
+
+        <label for="side-b">Side b:</label>
+        <input type="number" id="side-b" step="any"><br>
+
+        <label for="side-c">Side c (hypotenuse):</label>
+        <input type="number" id="side-c" step="any"><br>
+
+        <label for="angle-A">Angle A (degrees):</label>
+        <input type="number" id="angle-A" step="any"><br>
+
+        <label for="angle-B">Angle B (degrees):</label>
+        <input type="number" id="angle-B" step="any"><br>
+
+        <button type="button" onclick="solveTriangle()">Solve Triangle</button>
+    </form>
+    <div id="results">
+        <!-- Results will be displayed here -->
+    </div>
+    <script>
+        function solveTriangle() {
+            // Get the input values
+            let a = parseFloat(document.getElementById('side-a').value);
+            let b = parseFloat(document.getElementById('side-b').value);
+            let c = parseFloat(document.getElementById('side-c').value);
+            let angleA = parseFloat(document.getElementById('angle-A').value);
+            let angleB = parseFloat(document.getElementById('angle-B').value);
+
+            // Initialize variables
+            let angleC = 90; // Angle C is always 90 degrees
+            let knownSides = 0;
+            let knownAngles = 0;
+
+            // Count the number of known sides and angles
+            if (!isNaN(a)) knownSides++;
+            if (!isNaN(b)) knownSides++;
+            if (!isNaN(c)) knownSides++;
+            if (!isNaN(angleA)) knownAngles++;
+            if (!isNaN(angleB)) knownAngles++;
+
+            // Check that we have at least two known values, including at least one side
+            if (knownSides + knownAngles < 2 || knownSides < 1) {
+                alert("Please enter at least two values, including at least one side.");
+                return;
+            }
+
+            // Solve the triangle based on the known values
+            // Initialize variables to hold the computed values
+            let results = {};
+
+            // Function to convert degrees to radians
+            function toRadians(degrees) {
+                return degrees * (Math.PI / 180);
+            }
+
+            // Function to convert radians to degrees
+            function toDegrees(radians) {
+                return radians * (180 / Math.PI);
+            }
+
+            // Solve for missing values
+            try {
+                if (!isNaN(a) && !isNaN(b)) {
+                    // Both a and b are known
+                    c = Math.sqrt(a * a + b * b);
+                    angleA = toDegrees(Math.atan(b / a));
+                    angleB = 90 - angleA;
+                } else if (!isNaN(a) && !isNaN(c)) {
+                    // a and c are known
+                    b = Math.sqrt(c * c - a * a);
+                    angleA = toDegrees(Math.acos(a / c));
+                    angleB = 90 - angleA;
+                } else if (!isNaN(b) && !isNaN(c)) {
+                    // b and c are known
+                    a = Math.sqrt(c * c - b * b);
+                    angleB = toDegrees(Math.acos(b / c));
+                    angleA = 90 - angleB;
+                } else if (!isNaN(a) && !isNaN(angleA)) {
+                    // a and angleA are known
+                    angleB = 90 - angleA;
+                    let angleA_rad = toRadians(angleA);
+                    b = a * Math.tan(angleA_rad);
+                    c = a / Math.cos(angleA_rad);
+                } else if (!isNaN(a) && !isNaN(angleB)) {
+                    // a and angleB are known
+                    angleA = 90 - angleB;
+                    let angleA_rad = toRadians(angleA);
+                    b = a * Math.tan(angleA_rad);
+                    c = a / Math.cos(angleA_rad);
+                } else if (!isNaN(b) && !isNaN(angleA)) {
+                    // b and angleA are known
+                    angleB = 90 - angleA;
+                    let angleA_rad = toRadians(angleA);
+                    a = b / Math.tan(angleA_rad);
+                    c = b / Math.sin(angleA_rad);
+                } else if (!isNaN(b) && !isNaN(angleB)) {
+                    // b and angleB are known
+                    angleA = 90 - angleB;
+                    let angleB_rad = toRadians(angleB);
+                    a = b / Math.tan(angleB_rad);
+                    c = b / Math.cos(angleB_rad);
+                } else if (!isNaN(c) && !isNaN(angleA)) {
+                    // c and angleA are known
+                    angleB = 90 - angleA;
+                    let angleA_rad = toRadians(angleA);
+                    a = c * Math.cos(angleA_rad);
+                    b = c * Math.sin(angleA_rad);
+                } else if (!isNaN(c) && !isNaN(angleB)) {
+                    // c and angleB are known
+                    angleA = 90 - angleB;
+                    let angleB_rad = toRadians(angleB);
+                    b = c * Math.cos(angleB_rad);
+                    a = c * Math.sin(angleB_rad);
+                } else {
+                    alert("Insufficient or inconsistent data provided.");
+                    return;
+                }
+
+                // Prepare the results
+                results = {
+                    "Side a": a.toFixed(3),
+                    "Side b": b.toFixed(3),
+                    "Side c (hypotenuse)": c.toFixed(3),
+                    "Angle A": angleA.toFixed(3) + "°",
+                    "Angle B": angleB.toFixed(3) + "°",
+                    "Angle C": angleC + "°"
+                };
+
+                // Display the results
+                displayResults(results);
+            } catch (error) {
+                alert("Error in calculation. Please check your inputs.");
+            }
+        }
+
+        function displayResults(results) {
+            let resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = "<h2>Results:</h2>";
+            for (let key in results) {
+                resultsDiv.innerHTML += "<p>" + key + ": " + results[key] + "</p>";
+            }
+        }
+    </script>
+</body>
+</html>
